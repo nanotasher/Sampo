@@ -1,0 +1,28 @@
+app = "sampo"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  ENVIRONMENT = "fly"
+
+[http_service]
+  internal_port = 8080
+  processes = ["api"]
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = false
+
+[checks]
+  [checks.primary]
+    type = "http"
+    port = 8080
+    interval = "15s"
+    timeout = "2s"
+    path = "/health"
+
+[processes]
+  api = "uvicorn app.main:app --host 0.0.0.0 --port 8080"
+  worker = "python -m app.worker"
